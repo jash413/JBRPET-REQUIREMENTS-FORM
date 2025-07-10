@@ -13,7 +13,8 @@ import {
   ExternalLink,
   Eye,
   Edit,
-  Trash2
+  Trash2,
+  Sparkles
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -95,7 +96,7 @@ const Admin = () => {
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
-    navigate("/");
+    navigate("/auth");
   };
 
   const deleteForm = async (formId: string) => {
@@ -141,7 +142,7 @@ const Admin = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-subtle flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-elegant flex items-center justify-center">
         <div className="text-center">
           <ClipboardList className="h-12 w-12 text-primary mx-auto mb-4 animate-pulse" />
           <p className="text-muted-foreground">Loading admin panel...</p>
@@ -151,26 +152,26 @@ const Admin = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-subtle">
+    <div className="min-h-screen bg-gradient-elegant">
       {/* Header */}
-      <header className="border-b bg-card/50 backdrop-blur-sm">
+      <header className="border-b bg-card/80 backdrop-blur-sm shadow-soft">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
               <div className="flex items-center space-x-2">
-                <ClipboardList className="h-8 w-8 text-primary" />
-                <span className="text-2xl font-bold bg-gradient-primary bg-clip-text text-transparent">
-                  RequireFlow
-                </span>
+                <div className="p-2 bg-primary rounded-lg shadow-luxury">
+                  <ClipboardList className="h-6 w-6 text-white" />
+                </div>
+                <div>
+                  <span className="text-2xl font-bold text-gradient">
+                    RequireFlow
+                  </span>
+                  <Badge variant="secondary" className="ml-2">Admin Panel</Badge>
+                </div>
               </div>
-              <Badge variant="secondary">Admin Panel</Badge>
             </div>
             <div className="flex items-center space-x-2">
-              <Button variant="outline" onClick={() => navigate("/")} size="sm">
-                <ExternalLink className="h-4 w-4 mr-2" />
-                View Site
-              </Button>
-              <Button variant="outline" onClick={handleSignOut} size="sm">
+              <Button variant="outline" onClick={handleSignOut} size="sm" className="shadow-soft">
                 <LogOut className="h-4 w-4 mr-2" />
                 Sign Out
               </Button>
@@ -182,58 +183,68 @@ const Admin = () => {
       <div className="container mx-auto px-4 py-8">
         {/* Welcome Section */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2">Welcome back, Admin!</h1>
-          <p className="text-muted-foreground">
-            Manage your forms, track responses, and engage with your clients.
+          <h1 className="text-4xl font-bold mb-2 text-gradient">
+            Welcome back, Admin!
+          </h1>
+          <p className="text-muted-foreground text-lg">
+            Manage your forms, track responses, and engage with your clients seamlessly.
           </p>
         </div>
 
         {/* Stats Cards */}
         <div className="grid md:grid-cols-4 gap-6 mb-8">
-          <Card className="shadow-card border-0 bg-card/80 backdrop-blur-sm">
+          <Card className="shadow-luxury border-0 bg-gradient-card backdrop-blur-sm hover:shadow-elegant transition-all duration-300">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-muted-foreground">Total Forms</p>
-                  <p className="text-2xl font-bold">{forms.length}</p>
+                  <p className="text-3xl font-bold text-primary">{forms.length}</p>
                 </div>
-                <ClipboardList className="h-8 w-8 text-primary" />
+                <div className="p-3 bg-primary rounded-lg">
+                  <ClipboardList className="h-6 w-6 text-white" />
+                </div>
               </div>
             </CardContent>
           </Card>
 
-          <Card className="shadow-card border-0 bg-card/80 backdrop-blur-sm">
+          <Card className="shadow-luxury border-0 bg-gradient-card backdrop-blur-sm hover:shadow-elegant transition-all duration-300">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-muted-foreground">Active Forms</p>
-                  <p className="text-2xl font-bold">{forms.filter(f => f.is_active).length}</p>
+                  <p className="text-3xl font-bold text-primary">{forms.filter(f => f.is_active).length}</p>
                 </div>
-                <Settings className="h-8 w-8 text-success" />
+                <div className="p-3 bg-primary rounded-lg">
+                  <Settings className="h-6 w-6 text-white" />
+                </div>
               </div>
             </CardContent>
           </Card>
 
-          <Card className="shadow-card border-0 bg-card/80 backdrop-blur-sm">
+          <Card className="shadow-luxury border-0 bg-gradient-card backdrop-blur-sm hover:shadow-elegant transition-all duration-300">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-muted-foreground">Total Responses</p>
-                  <p className="text-2xl font-bold">{forms.reduce((sum, f) => sum + (f.response_count || 0), 0)}</p>
+                  <p className="text-3xl font-bold text-primary">{forms.reduce((sum, f) => sum + (f.response_count || 0), 0)}</p>
                 </div>
-                <BarChart3 className="h-8 w-8 text-primary" />
+                <div className="p-3 bg-primary rounded-lg">
+                  <BarChart3 className="h-6 w-6 text-white" />
+                </div>
               </div>
             </CardContent>
           </Card>
 
-          <Card className="shadow-card border-0 bg-card/80 backdrop-blur-sm">
+          <Card className="shadow-luxury border-0 bg-gradient-card backdrop-blur-sm hover:shadow-elegant transition-all duration-300">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-muted-foreground">Clients</p>
-                  <p className="text-2xl font-bold">{forms.length}</p>
+                  <p className="text-3xl font-bold text-primary">{forms.length}</p>
                 </div>
-                <Users className="h-8 w-8 text-primary" />
+                <div className="p-3 bg-primary rounded-lg">
+                  <Users className="h-6 w-6 text-white" />
+                </div>
               </div>
             </CardContent>
           </Card>
@@ -241,10 +252,12 @@ const Admin = () => {
 
         {/* Forms Section */}
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-bold">Forms & Questionnaires</h2>
+          <h2 className="text-3xl font-bold text-gradient">
+            Forms & Questionnaires
+          </h2>
           <Button 
             onClick={() => navigate("/admin/form-builder")}
-            className="shadow-elegant"
+            className="shadow-elegant hover:shadow-luxury transition-all duration-300"
           >
             <Plus className="h-4 w-4 mr-2" />
             Create New Form
@@ -252,18 +265,21 @@ const Admin = () => {
         </div>
 
         {forms.length === 0 ? (
-          <Card className="shadow-card border-0 bg-card/80 backdrop-blur-sm">
+          <Card className="shadow-luxury border-0 bg-gradient-card backdrop-blur-sm">
             <CardContent className="p-12 text-center">
-              <ClipboardList className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
-              <h3 className="text-lg font-semibold mb-2">No forms yet</h3>
-              <p className="text-muted-foreground mb-6">
+              <div className="p-6 bg-primary rounded-full w-24 h-24 mx-auto mb-6 flex items-center justify-center">
+                <ClipboardList className="h-12 w-12 text-white" />
+              </div>
+              <h3 className="text-2xl font-semibold mb-2 text-primary">No forms yet</h3>
+              <p className="text-muted-foreground mb-8 text-lg">
                 Create your first questionnaire to start gathering requirements from clients.
               </p>
               <Button 
                 onClick={() => navigate("/admin/form-builder")}
-                className="shadow-elegant"
+                className="shadow-elegant hover:shadow-luxury transition-all duration-300"
+                size="lg"
               >
-                <Plus className="h-4 w-4 mr-2" />
+                <Sparkles className="h-5 w-5 mr-2" />
                 Create Your First Form
               </Button>
             </CardContent>
@@ -271,38 +287,40 @@ const Admin = () => {
         ) : (
           <div className="grid lg:grid-cols-2 xl:grid-cols-3 gap-6">
             {forms.map((form) => (
-              <Card key={form.id} className="shadow-card hover:shadow-elegant transition-all duration-300 border-0 bg-card/80 backdrop-blur-sm group">
-                <CardHeader>
+              <Card key={form.id} className="shadow-luxury hover:shadow-elegant transition-all duration-300 border-0 bg-gradient-card backdrop-blur-sm group">
+                <CardHeader className="pb-4">
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
-                      <CardTitle className="text-lg group-hover:text-primary transition-colors">
+                      <CardTitle className="text-xl group-hover:text-primary transition-colors mb-2">
                         {form.title}
                       </CardTitle>
-                      <CardDescription className="mt-1">
-                        Client: <span className="font-medium">{form.client_name}</span>
+                      <CardDescription className="text-base">
+                        Client: <span className="font-semibold text-primary">{form.client_name}</span>
                       </CardDescription>
                       {form.description && (
-                        <p className="text-sm text-muted-foreground mt-2 line-clamp-2">
+                        <p className="text-sm text-muted-foreground mt-3 line-clamp-2">
                           {form.description}
                         </p>
                       )}
                     </div>
-                    <Badge variant={form.is_active ? "default" : "secondary"}>
+                    <Badge 
+                      variant={form.is_active ? "default" : "secondary"}
+                    >
                       {form.is_active ? "Active" : "Inactive"}
                     </Badge>
                   </div>
                 </CardHeader>
                 <CardContent>
-                  <div className="flex items-center justify-between text-sm text-muted-foreground mb-4">
+                  <div className="flex items-center justify-between text-sm text-muted-foreground mb-6">
                     <span>Created {formatDate(form.created_at)}</span>
-                    <span>{form.response_count || 0} responses</span>
+                    <span className="font-semibold text-primary">{form.response_count || 0} responses</span>
                   </div>
-                  <div className="flex flex-col gap-2">
+                  <div className="flex flex-col gap-3">
                     <div className="flex gap-2">
                       <Button 
                         variant="outline" 
                         size="sm" 
-                        className="flex-1"
+                        className="flex-1 shadow-soft hover:shadow-luxury transition-all duration-300"
                         onClick={() => window.open(`/${form.client_name}`, '_blank')}
                       >
                         <Eye className="h-4 w-4 mr-2" />
@@ -311,7 +329,7 @@ const Admin = () => {
                       <Button 
                         variant="outline" 
                         size="sm" 
-                        className="flex-1"
+                        className="flex-1 shadow-soft hover:shadow-luxury transition-all duration-300"
                         onClick={() => navigate(`/admin/responses/${form.id}`)}
                       >
                         <BarChart3 className="h-4 w-4 mr-2" />
@@ -322,7 +340,7 @@ const Admin = () => {
                       <Button 
                         variant="outline" 
                         size="sm" 
-                        className="flex-1"
+                        className="flex-1 shadow-soft hover:shadow-luxury transition-all duration-300"
                         onClick={() => navigate(`/admin/form-builder?edit=${form.id}`)}
                       >
                         <Edit className="h-4 w-4 mr-2" />
@@ -331,7 +349,7 @@ const Admin = () => {
                       <Button 
                         variant="outline" 
                         size="sm" 
-                        className="flex-1 text-destructive hover:text-destructive"
+                        className="flex-1 text-destructive hover:text-destructive shadow-soft hover:shadow-luxury transition-all duration-300"
                         onClick={() => deleteForm(form.id)}
                         disabled={isDeleting === form.id}
                       >

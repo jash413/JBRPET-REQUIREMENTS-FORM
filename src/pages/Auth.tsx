@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ClipboardList, Mail, Lock, User } from "lucide-react";
+import { ClipboardList, Mail, Lock, Sparkles } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
@@ -37,7 +37,7 @@ const Auth = () => {
           title: "Welcome back!",
           description: "You have been signed in successfully.",
         });
-        navigate("/admin");
+        navigate("/auth/callback");
       }
     } catch (error) {
       toast({
@@ -59,7 +59,7 @@ const Auth = () => {
         email,
         password,
         options: {
-          emailRedirectTo: `${window.location.origin}/admin`,
+          emailRedirectTo: `${window.location.origin}/auth/callback`,
         },
       });
 
@@ -87,34 +87,38 @@ const Auth = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-subtle flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-elegant flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <div className="flex items-center justify-center space-x-2 mb-4">
-            <ClipboardList className="h-8 w-8 text-primary" />
-            <span className="text-2xl font-bold bg-gradient-primary bg-clip-text text-transparent">
+          <div className="flex items-center justify-center space-x-3 mb-6">
+            <div className="p-3 bg-primary rounded-xl shadow-luxury">
+              <ClipboardList className="h-8 w-8 text-white" />
+            </div>
+            <span className="text-3xl font-bold text-gradient">
               RequireFlow
             </span>
           </div>
-          <p className="text-muted-foreground">Admin Access Portal</p>
+          <p className="text-muted-foreground text-lg">Admin Access Portal</p>
         </div>
 
-        <Card className="shadow-elegant border-0 bg-card/80 backdrop-blur-sm">
-          <CardHeader className="text-center">
-            <CardTitle>Welcome</CardTitle>
-            <CardDescription>
+        <Card className="shadow-luxury border-0 bg-gradient-card backdrop-blur-sm">
+          <CardHeader className="text-center pb-6">
+            <CardTitle className="text-2xl text-gradient">
+              Welcome
+            </CardTitle>
+            <CardDescription className="text-base">
               Sign in to your admin account or create a new one
             </CardDescription>
           </CardHeader>
           <CardContent>
             <Tabs defaultValue="signin" className="w-full">
-              <TabsList className="grid w-full grid-cols-2">
+              <TabsList className="grid w-full grid-cols-2 mb-6">
                 <TabsTrigger value="signin">Sign In</TabsTrigger>
                 <TabsTrigger value="signup">Sign Up</TabsTrigger>
               </TabsList>
 
               <TabsContent value="signin">
-                <form onSubmit={handleSignIn} className="space-y-4">
+                <form onSubmit={handleSignIn} className="space-y-6">
                   <div className="space-y-2">
                     <Label htmlFor="signin-email">Email</Label>
                     <div className="relative">
@@ -125,7 +129,7 @@ const Auth = () => {
                         placeholder="admin@example.com"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
-                        className="pl-10"
+                        className="pl-10 shadow-soft"
                         required
                       />
                     </div>
@@ -140,15 +144,16 @@ const Auth = () => {
                         placeholder="••••••••"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
-                        className="pl-10"
+                        className="pl-10 shadow-soft"
                         required
                       />
                     </div>
                   </div>
                   <Button 
                     type="submit" 
-                    className="w-full shadow-elegant" 
+                    className="w-full shadow-elegant hover:shadow-luxury transition-all duration-300" 
                     disabled={isLoading}
+                    size="lg"
                   >
                     {isLoading ? "Signing in..." : "Sign In"}
                   </Button>
@@ -156,7 +161,7 @@ const Auth = () => {
               </TabsContent>
 
               <TabsContent value="signup">
-                <form onSubmit={handleSignUp} className="space-y-4">
+                <form onSubmit={handleSignUp} className="space-y-6">
                   <div className="space-y-2">
                     <Label htmlFor="signup-email">Email</Label>
                     <div className="relative">
@@ -167,7 +172,7 @@ const Auth = () => {
                         placeholder="admin@example.com"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
-                        className="pl-10"
+                        className="pl-10 shadow-soft"
                         required
                       />
                     </div>
@@ -182,7 +187,7 @@ const Auth = () => {
                         placeholder="••••••••"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
-                        className="pl-10"
+                        className="pl-10 shadow-soft"
                         required
                         minLength={6}
                       />
@@ -190,9 +195,11 @@ const Auth = () => {
                   </div>
                   <Button 
                     type="submit" 
-                    className="w-full shadow-elegant" 
+                    className="w-full shadow-elegant hover:shadow-luxury transition-all duration-300" 
                     disabled={isLoading}
+                    size="lg"
                   >
+                    <Sparkles className="h-4 w-4 mr-2" />
                     {isLoading ? "Creating account..." : "Create Account"}
                   </Button>
                 </form>
@@ -200,16 +207,6 @@ const Auth = () => {
             </Tabs>
           </CardContent>
         </Card>
-
-        <div className="text-center mt-6">
-          <Button 
-            variant="ghost" 
-            onClick={() => navigate("/")}
-            className="text-muted-foreground hover:text-foreground"
-          >
-            ← Back to Home
-          </Button>
-        </div>
       </div>
     </div>
   );

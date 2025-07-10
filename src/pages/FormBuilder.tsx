@@ -5,29 +5,20 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Switch } from "@/components/ui/switch";
-import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
   Plus, 
   Save, 
   ArrowLeft, 
-  Trash2, 
-  GripVertical,
-  Type,
-  AlignLeft,
-  Mail,
-  Hash,
-  Calendar,
-  ListChecks,
-  CircleDot,
-  CheckSquare
+  FileText,
+  Settings
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { SectionBuilder, Section } from "@/components/SectionBuilder";
-import { ConditionalLogic, QuestionCondition } from "@/components/ConditionalLogic";
+import { QuestionCondition } from "@/components/ConditionalLogic";
 import { QuestionCard } from "@/components/QuestionCard";
+import { ClientRequirements, RequirementItem, RequirementImage } from "@/components/ClientRequirements";
 
 type QuestionType = "text" | "textarea" | "email" | "number" | "date" | "select" | "radio" | "checkbox";
 
@@ -43,17 +34,6 @@ interface Question {
   conditions: QuestionCondition[];
 }
 
-const questionTypes = [
-  { value: "text", label: "Text Input", icon: Type },
-  { value: "textarea", label: "Text Area", icon: AlignLeft },
-  { value: "email", label: "Email", icon: Mail },
-  { value: "number", label: "Number", icon: Hash },
-  { value: "date", label: "Date", icon: Calendar },
-  { value: "select", label: "Dropdown", icon: ListChecks },
-  { value: "radio", label: "Radio Buttons", icon: CircleDot },
-  { value: "checkbox", label: "Checkboxes", icon: CheckSquare },
-];
-
 const FormBuilder = () => {
   const [searchParams] = useSearchParams();
   const editId = searchParams.get("edit");
@@ -67,6 +47,12 @@ const FormBuilder = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [expandedSections, setExpandedSections] = useState<Set<number>>(new Set([0]));
+  
+  // Client requirements state
+  const [requirementsTitle, setRequirementsTitle] = useState("");
+  const [requirementsDescription, setRequirementsDescription] = useState("");
+  const [requirements, setRequirements] = useState<RequirementItem[]>([]);
+  const [requirementImages, setRequirementImages] = useState<RequirementImage[]>([]);
   
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -126,9 +112,28 @@ const FormBuilder = () => {
 
       if (conditionsError) throw conditionsError;
 
+      // Load client requirements
+      const { data: clientReqData, error: clientReqError } = await supabase
+        .from("client_requirements")
+        .select("*")
+        .eq("form_id", editId)
+        .single();
+
+      if (clientReqError && clientReqError.code !== "PGRST116") {
+        throw clientReqError;
+      }
+
       setFormTitle(form.title);
       setFormDescription(form.description || "");
       setClientName(form.client_name);
+      
+      // Set client requirements if they exist
+      if (clientReqData) {
+        setRequirementsTitle(clientReqData.title || "");
+        setRequirementsDescription(clientReqData.description || "");
+        setRequirements(clientReqData.requirements || []);
+        setRequirementImages(clientReqData.images || []);
+      }
       
       setSections(sectionsData.map(s => ({
         id: s.id,
@@ -383,6 +388,47 @@ const FormBuilder = () => {
         }
       }
 
+      // Save client requirements
+      if (requirementsTitle || requirementsDescription || requirements.length > 0 || requirementImages.length > 0) {
+        const requirementsData = {
+          form_id: formId,
+          title: requirementsTitle,
+          description: requirementsDescription,
+          requirements: requirements,
+          images: requirementImages
+        };
+
+        if (isEditing) {
+          // Check if client requirements exist
+          const { data: existingReq } = await supabase
+            .from("client_requirements")
+            .select("id")
+            .eq("form_id", formId)
+            .single();
+
+          if (existingReq) {
+            const { error: updateReqError } = await supabase
+              .from("client_requirements")
+              .update(requirementsData)
+              .eq("form_id", formId);
+
+            if (updateReqError) throw updateReqError;
+          } else {
+            const { error: insertReqError } = await supabase
+              .from("client_requirements")
+              .insert(requirementsData);
+
+            if (insertReqError) throw insertReqError;
+          }
+        } else {
+          const { error: insertReqError } = await supabase
+            .from("client_requirements")
+            .insert(requirementsData);
+
+          if (insertReqError) throw insertReqError;
+        }
+      }
+
       toast({
         title: isEditing ? "Form updated!" : "Form created!",
         description: `Your questionnaire for ${clientName} has been ${isEditing ? "updated" : "created"} successfully.`,
@@ -403,7 +449,7 @@ const FormBuilder = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-subtle flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-sky flex items-center justify-center">
         <div className="text-center">
           <div className="animate-pulse">Loading form builder...</div>
         </div>
@@ -412,21 +458,25 @@ const FormBuilder = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-subtle">
+    <div className="min-h-screen bg-gradient-elegant">
       {/* Header */}
-      <header className="border-b bg-card/50 backdrop-blur-sm">
+      <header className="border-b bg-card/80 backdrop-blur-sm shadow-luxury">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
-              <Button variant="ghost" onClick={() => navigate("/admin")}>
+              <Button variant="ghost" onClick={() => navigate("/admin")} className="shadow-soft">
                 <ArrowLeft className="h-4 w-4 mr-2" />
                 Back to Admin
               </Button>
-              <h1 className="text-xl font-semibold">
+              <h1 className="text-2xl font-bold text-gradient">
                 {isEditing ? "Edit Form" : "Form Builder"}
               </h1>
             </div>
-            <Button onClick={saveForm} disabled={isSaving} className="shadow-elegant">
+            <Button 
+              onClick={saveForm} 
+              disabled={isSaving} 
+              className="shadow-elegant hover:shadow-luxury transition-all duration-300"
+            >
               <Save className="h-4 w-4 mr-2" />
               {isSaving ? "Saving..." : "Save Form"}
             </Button>
@@ -436,62 +486,99 @@ const FormBuilder = () => {
 
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-4xl mx-auto">
-          {/* Form Details */}
-          <Card className="shadow-card border-0 bg-card/80 backdrop-blur-sm mb-8">
-            <CardHeader>
-              <CardTitle>Form Details</CardTitle>
-              <CardDescription>
-                Basic information about your questionnaire
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="form-title">Form Title *</Label>
-                  <Input
-                    id="form-title"
-                    placeholder="Requirements Gathering Questionnaire"
-                    value={formTitle}
-                    onChange={(e) => setFormTitle(e.target.value)}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="client-name">Client Name *</Label>
-                  <Input
-                    id="client-name"
-                    placeholder="acme-corp"
-                    value={clientName}
-                    onChange={(e) => setClientName(e.target.value.toLowerCase().replace(/\s+/g, '-'))}
-                    disabled={isEditing}
-                  />
-                  {clientName && (
-                    <p className="text-sm text-muted-foreground">
-                      Form will be available at: /{clientName}
-                    </p>
-                  )}
-                </div>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="form-description">Description</Label>
-                <Textarea
-                  id="form-description"
-                  placeholder="Brief description of the questionnaire purpose..."
-                  value={formDescription}
-                  onChange={(e) => setFormDescription(e.target.value)}
-                />
-              </div>
-            </CardContent>
-          </Card>
+          <Tabs defaultValue="form-details" className="space-y-6">
+            <TabsList className="grid w-full grid-cols-3 shadow-luxury">
+              <TabsTrigger value="form-details" className="flex items-center gap-2">
+                <Settings className="h-4 w-4" />
+                Form Details
+              </TabsTrigger>
+              <TabsTrigger value="requirements" className="flex items-center gap-2">
+                <FileText className="h-4 w-4" />
+                Client Requirements
+              </TabsTrigger>
+              <TabsTrigger value="questions" className="flex items-center gap-2">
+                <Plus className="h-4 w-4" />
+                Questions
+              </TabsTrigger>
+            </TabsList>
 
-          {/* Sections & Questions */}
-          <Card className="shadow-card border-0 bg-card/80 backdrop-blur-sm">
-            <CardHeader>
-              <CardTitle>Form Structure</CardTitle>
-              <CardDescription>
-                Organize your form with sections and questions
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
+            <TabsContent value="form-details">
+              <Card className="shadow-luxury border-0 bg-gradient-card backdrop-blur-sm">
+                <CardHeader>
+                  <CardTitle className="text-gradient">
+                    Form Details
+                  </CardTitle>
+                  <CardDescription>
+                    Basic information about your questionnaire
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="grid md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="form-title">Form Title *</Label>
+                      <Input
+                        id="form-title"
+                        placeholder="Requirements Gathering Questionnaire"
+                        value={formTitle}
+                        onChange={(e) => setFormTitle(e.target.value)}
+                        className="shadow-soft"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="client-name">Client Name *</Label>
+                      <Input
+                        id="client-name"
+                        placeholder="acme-corp"
+                        value={clientName}
+                        onChange={(e) => setClientName(e.target.value.toLowerCase().replace(/\s+/g, '-'))}
+                        disabled={isEditing}
+                        className="shadow-soft"
+                      />
+                      {clientName && (
+                        <p className="text-sm text-muted-foreground">
+                          Form will be available at: /{clientName}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="form-description">Description</Label>
+                    <Textarea
+                      id="form-description"
+                      placeholder="Brief description of the questionnaire purpose..."
+                      value={formDescription}
+                      onChange={(e) => setFormDescription(e.target.value)}
+                      className="shadow-soft"
+                    />
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="requirements">
+              <ClientRequirements
+                title={requirementsTitle}
+                description={requirementsDescription}
+                requirements={requirements}
+                images={requirementImages}
+                onTitleChange={setRequirementsTitle}
+                onDescriptionChange={setRequirementsDescription}
+                onRequirementsChange={setRequirements}
+                onImagesChange={setRequirementImages}
+              />
+            </TabsContent>
+
+            <TabsContent value="questions">
+              <Card className="shadow-luxury border-0 bg-gradient-card backdrop-blur-sm">
+                <CardHeader>
+                  <CardTitle className="text-gradient">
+                    Form Structure
+                  </CardTitle>
+                  <CardDescription>
+                    Organize your form with sections and questions
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
               <SectionBuilder
                 sections={sections}
                 onAddSection={() => {
@@ -633,15 +720,20 @@ const FormBuilder = () => {
                 }).length === 0 && (
                   <div className="text-center py-8 border-2 border-dashed border-muted-foreground/20 rounded-lg">
                     <div className="text-muted-foreground mb-4">No standalone questions yet</div>
-                    <Button onClick={() => addQuestion()} className="shadow-elegant">
+                    <Button 
+                      onClick={() => addQuestion()} 
+                      className="shadow-elegant hover:shadow-luxury transition-all duration-300"
+                    >
                       <Plus className="h-4 w-4 mr-2" />
                       Add Your First Question
                     </Button>
                   </div>
                 )}
               </div>
-            </CardContent>
-          </Card>
+                </CardContent>
+              </Card>
+            </TabsContent>
+          </Tabs>
         </div>
       </div>
     </div>

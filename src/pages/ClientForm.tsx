@@ -9,12 +9,15 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Progress } from "@/components/ui/progress";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
   ClipboardList, 
   Send, 
   CheckCircle2, 
   ArrowLeft,
-  Calendar as CalendarIcon 
+  Calendar as CalendarIcon,
+  FileText,
+  Image as ImageIcon
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -22,6 +25,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
+import { ClientRequirements, RequirementItem, RequirementImage } from "@/components/ClientRequirements";
 
 interface Form {
   id: string;
@@ -51,10 +55,20 @@ interface Question {
 const ClientForm = () => {
   const { clientName } = useParams<{ clientName: string }>();
   const navigate = useNavigate();
+  
+  // Fix the URL parsing issue by extracting only the client name
+  const actualClientName = clientName?.split('?')[0] || clientName;
+  
   const [form, setForm] = useState<Form | null>(null);
   const [sections, setSections] = useState<Section[]>([]);
   const [questions, setQuestions] = useState<Question[]>([]);
   const [answers, setAnswers] = useState<Record<string, any>>({});
+  const [clientRequirements, setClientRequirements] = useState<{
+    title: string;
+    description: string;
+    requirements: RequirementItem[];
+    images: RequirementImage[];
+  } | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
@@ -66,14 +80,14 @@ const ClientForm = () => {
   }, [clientName]);
 
   const loadForm = async () => {
-    if (!clientName) return;
+    if (!actualClientName) return;
 
     try {
       // Load form
       const { data: formData, error: formError } = await supabase
         .from("forms")
         .select("*")
-        .eq("client_name", clientName)
+        .eq("client_name", actualClientName)
         .eq("is_active", true)
         .single();
 
@@ -104,6 +118,26 @@ const ClientForm = () => {
         .order("order_index");
 
       if (questionsError) throw questionsError;
+
+      // Load client requirements
+      const { data: clientReqData, error: clientReqError } = await supabase
+        .from("client_requirements")
+        .select("*")
+        .eq("form_id", formData.id)
+        .single();
+
+      if (clientReqError && clientReqError.code !== "PGRST116") {
+        throw clientReqError;
+      }
+
+      if (clientReqData) {
+        setClientRequirements({
+          title: clientReqData.title || "",
+          description: clientReqData.description || "",
+          requirements: clientReqData.requirements || [],
+          images: clientReqData.images || []
+        });
+      }
 
       setForm(formData);
       setSections(sectionsData || []);
@@ -336,7 +370,7 @@ const ClientForm = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-subtle flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-sky flex items-center justify-center">
         <div className="text-center">
           <ClipboardList className="h-12 w-12 text-primary mx-auto mb-4 animate-pulse" />
           <p className="text-muted-foreground">Loading questionnaire...</p>
@@ -347,13 +381,13 @@ const ClientForm = () => {
 
   if (!form) {
     return (
-      <div className="min-h-screen bg-gradient-subtle flex items-center justify-center p-4">
-        <Card className="max-w-md mx-auto shadow-elegant border-0 bg-card/80 backdrop-blur-sm">
+      <div className="min-h-screen bg-gradient-sky flex items-center justify-center p-4">
+        <Card className="max-w-md mx-auto shadow-elegant border-0 bg-gradient-card backdrop-blur-sm">
           <CardContent className="p-8 text-center">
             <ClipboardList className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
             <h2 className="text-xl font-semibold mb-2">Form Not Found</h2>
             <p className="text-muted-foreground mb-6">
-              The questionnaire for "{clientName}" could not be found or is not currently active.
+              The questionnaire for "{actualClientName}" could not be found or is not currently active.
             </p>
             <Button onClick={() => navigate("/")} variant="outline">
               <ArrowLeft className="h-4 w-4 mr-2" />
@@ -367,8 +401,8 @@ const ClientForm = () => {
 
   if (isSubmitted) {
     return (
-      <div className="min-h-screen bg-gradient-subtle flex items-center justify-center p-4">
-        <Card className="max-w-md mx-auto shadow-elegant border-0 bg-card/80 backdrop-blur-sm">
+      <div className="min-h-screen bg-gradient-sky flex items-center justify-center p-4">
+        <Card className="max-w-md mx-auto shadow-elegant border-0 bg-gradient-card backdrop-blur-sm">
           <CardContent className="p-8 text-center">
             <CheckCircle2 className="h-16 w-16 text-success mx-auto mb-4" />
             <h2 className="text-2xl font-bold mb-2">Thank You!</h2>
@@ -387,19 +421,33 @@ const ClientForm = () => {
   const currentQuestion = questions[currentStep];
   const progress = ((currentStep + 1) / questions.length) * 100;
 
+  // Check if we should show requirements tab
+  const hasRequirements = clientRequirements && (
+    clientRequirements.title || 
+    clientRequirements.description || 
+    clientRequirements.requirements.length > 0 || 
+    clientRequirements.images.length > 0
+  );
+
   return (
-    <div className="min-h-screen bg-gradient-subtle">
+    <div className="min-h-screen bg-gradient-elegant">
       {/* Header */}
-      <header className="border-b bg-card/50 backdrop-blur-sm">
+      <header className="border-b bg-card/80 backdrop-blur-sm shadow-luxury">
         <div className="container mx-auto px-4 py-6">
           <div className="text-center">
             <div className="flex items-center justify-center space-x-2 mb-2">
-              <ClipboardList className="h-6 w-6 text-primary" />
-              <span className="text-lg font-semibold text-primary">RequireFlow</span>
+              <div className="p-2 bg-primary rounded-lg shadow-luxury">
+                <ClipboardList className="h-5 w-5 text-white" />
+              </div>
+              <span className="text-xl font-bold text-gradient">
+                RequireFlow
+              </span>
             </div>
-            <h1 className="text-2xl font-bold">{form.title}</h1>
+            <h1 className="text-3xl font-bold text-gradient">
+              {form.title}
+            </h1>
             {form.description && (
-              <p className="text-muted-foreground mt-2">{form.description}</p>
+              <p className="text-muted-foreground mt-2 text-lg">{form.description}</p>
             )}
           </div>
         </div>
@@ -407,97 +455,138 @@ const ClientForm = () => {
 
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-2xl mx-auto">
-          {/* Progress */}
-          <div className="mb-8">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-sm font-medium">
-                Question {currentStep + 1} of {questions.length}
-              </span>
-              <span className="text-sm text-muted-foreground">
-                {Math.round(progress)}% Complete
-              </span>
-            </div>
-            <Progress value={progress} className="h-2" />
-          </div>
+          {hasRequirements ? (
+            <Tabs defaultValue="requirements" className="space-y-6">
+              <TabsList className="grid w-full grid-cols-2 shadow-luxury">
+                <TabsTrigger value="requirements" className="flex items-center gap-2">
+                  <FileText className="h-4 w-4" />
+                  Requirements
+                </TabsTrigger>
+                <TabsTrigger value="questionnaire" className="flex items-center gap-2">
+                  <ClipboardList className="h-4 w-4" />
+                  Questionnaire
+                </TabsTrigger>
+              </TabsList>
 
-          {/* Section Header */}
-          {currentQuestion.section_id && sections.length > 0 && (() => {
-            const currentSection = sections.find(s => s.id === currentQuestion.section_id);
-            const isFirstQuestionInSection = currentStep === 0 || 
-              questions[currentStep - 1]?.section_id !== currentQuestion.section_id;
-            
-            if (currentSection && isFirstQuestionInSection) {
-              return (
-                <Card className="shadow-soft border-0 bg-primary/5 backdrop-blur-sm mb-6">
-                  <CardContent className="p-4">
-                    <h2 className="text-lg font-semibold text-primary mb-1">
-                      {currentSection.title}
-                    </h2>
-                    {currentSection.description && (
-                      <p className="text-sm text-muted-foreground">
-                        {currentSection.description}
-                      </p>
-                    )}
-                  </CardContent>
-                </Card>
-              );
-            }
-            return null;
-          })()}
+              <TabsContent value="requirements">
+                <ClientRequirements
+                  title={clientRequirements.title}
+                  description={clientRequirements.description}
+                  requirements={clientRequirements.requirements}
+                  images={clientRequirements.images}
+                  onTitleChange={() => {}}
+                  onDescriptionChange={() => {}}
+                  onRequirementsChange={() => {}}
+                  onImagesChange={() => {}}
+                  readOnly={true}
+                />
+              </TabsContent>
 
-          {/* Question Card */}
-          <Card className="shadow-elegant border-0 bg-card/80 backdrop-blur-sm">
-            <CardHeader>
-              <CardTitle className="text-xl">
-                {currentQuestion.label}
-                {currentQuestion.is_required && (
-                  <span className="text-destructive ml-1">*</span>
-                )}
-              </CardTitle>
-              {currentQuestion.placeholder && (
-                <CardDescription className="text-base">
-                  {currentQuestion.placeholder}
-                </CardDescription>
-              )}
-            </CardHeader>
-            <CardContent className="space-y-6">
-              {renderQuestion(currentQuestion)}
-            </CardContent>
-          </Card>
-
-          {/* Navigation */}
-          <div className="flex items-center justify-between mt-8">
-            <Button
-              variant="outline"
-              onClick={prevStep}
-              disabled={currentStep === 0}
-              className="shadow-soft"
-            >
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Previous
-            </Button>
-
-            <Button
-              onClick={nextStep}
-              disabled={isSubmitting}
-              className="shadow-elegant"
-            >
-              {isSubmitting ? (
-                "Submitting..."
-              ) : currentStep === questions.length - 1 ? (
-                <>
-                  <Send className="h-4 w-4 mr-2" />
-                  Submit
-                </>
-              ) : (
-                "Next"
-              )}
-            </Button>
-          </div>
+              <TabsContent value="questionnaire">
+                {renderQuestionnaire()}
+              </TabsContent>
+            </Tabs>
+          ) : (
+            renderQuestionnaire()
+          )}
         </div>
       </div>
     </div>
   );
+
+  function renderQuestionnaire() {
+    return (
+      <>
+        {/* Progress */}
+        <div className="mb-8">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-sm font-medium">
+              Question {currentStep + 1} of {questions.length}
+            </span>
+            <span className="text-sm text-muted-foreground">
+              {Math.round(progress)}% Complete
+            </span>
+          </div>
+          <Progress value={progress} className="h-2 shadow-soft" />
+        </div>
+
+        {/* Section Header */}
+        {currentQuestion.section_id && sections.length > 0 && (() => {
+          const currentSection = sections.find(s => s.id === currentQuestion.section_id);
+          const isFirstQuestionInSection = currentStep === 0 || 
+            questions[currentStep - 1]?.section_id !== currentQuestion.section_id;
+          
+          if (currentSection && isFirstQuestionInSection) {
+            return (
+              <Card className="shadow-luxury border-0 bg-primary/5 backdrop-blur-sm mb-6">
+                <CardContent className="p-4">
+                  <h2 className="text-lg font-semibold text-primary mb-1">
+                    {currentSection.title}
+                  </h2>
+                  {currentSection.description && (
+                    <p className="text-sm text-muted-foreground">
+                      {currentSection.description}
+                    </p>
+                  )}
+                </CardContent>
+              </Card>
+            );
+          }
+          return null;
+        })()}
+
+        {/* Question Card */}
+        <Card className="shadow-luxury border-0 bg-gradient-card backdrop-blur-sm">
+          <CardHeader>
+            <CardTitle className="text-xl">
+              {currentQuestion.label}
+              {currentQuestion.is_required && (
+                <span className="text-destructive ml-1">*</span>
+              )}
+            </CardTitle>
+            {currentQuestion.placeholder && (
+              <CardDescription className="text-base">
+                {currentQuestion.placeholder}
+              </CardDescription>
+            )}
+          </CardHeader>
+          <CardContent className="space-y-6">
+            {renderQuestion(currentQuestion)}
+          </CardContent>
+        </Card>
+
+        {/* Navigation */}
+        <div className="flex items-center justify-between mt-8">
+          <Button
+            variant="outline"
+            onClick={prevStep}
+            disabled={currentStep === 0}
+            className="shadow-soft"
+          >
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Previous
+          </Button>
+
+          <Button
+            onClick={nextStep}
+            disabled={isSubmitting}
+            className="shadow-elegant hover:shadow-luxury transition-all duration-300"
+          >
+            {isSubmitting ? (
+              "Submitting..."
+            ) : currentStep === questions.length - 1 ? (
+              <>
+                <Send className="h-4 w-4 mr-2" />
+                Submit
+              </>
+            ) : (
+              "Next"
+            )}
+          </Button>
+        </div>
+      </>
+    );
+  }
 };
 
 export default ClientForm;

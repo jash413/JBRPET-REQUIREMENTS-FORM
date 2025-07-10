@@ -8,13 +8,18 @@ import { Label } from "@/components/ui/label";
 import { 
   ArrowLeft, 
   Download, 
+  FileText,
+  BarChart3 as BarChartIcon,
   Calendar,
   User,
-  FileText
+  FileText as FileIcon
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
+import { downloadResponsesPDF, downloadSummaryPDF } from "@/lib/pdfGenerator";
+import { downloadBRD } from "@/lib/brdGenerator";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 
 interface FormData {
   id: string;
@@ -184,6 +189,77 @@ const FormResponses = () => {
     ).join('\n');
   };
 
+  const exportPDF = () => {
+    if (!formData || responses.length === 0) return;
+
+    try {
+      downloadResponsesPDF(formData, responses, {
+        includeClientDetails: true,
+        includeFormDetails: true,
+        includeResponseSummary: true
+      });
+      
+      toast({
+        title: "PDF Generated",
+        description: "Your detailed responses report has been downloaded.",
+      });
+    } catch (error) {
+      console.error("Error generating PDF:", error);
+      toast({
+        title: "Export failed",
+        description: "Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const exportSummaryPDF = () => {
+    if (!formData) return;
+
+    try {
+      // Calculate basic analytics
+      const analytics = {
+        completionRate: responses.length > 0 ? 100 : 0, // Simplified - could be enhanced
+        averageTimeToComplete: "N/A", // Would need timing data
+        mostCommonAnswers: [] // Could be calculated from responses
+      };
+
+      downloadSummaryPDF(formData, responses, analytics);
+      
+      toast({
+        title: "Summary PDF Generated",
+        description: "Your analytics summary has been downloaded.",
+      });
+    } catch (error) {
+      console.error("Error generating summary PDF:", error);
+      toast({
+        title: "Export failed",
+        description: "Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const exportBRD = async () => {
+    if (!formData || responses.length === 0) return;
+
+    try {
+      await downloadBRD(formData, responses);
+      
+      toast({
+        title: "BRD Generated Successfully",
+        description: "Your AI-powered Business Requirements Document has been downloaded.",
+      });
+    } catch (error) {
+      console.error("Error generating BRD:", error);
+      toast({
+        title: "BRD Generation failed",
+        description: "Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
   const formatAnswer = (answer: any, type: string) => {
     if (answer === null || answer === undefined) return "No answer";
     
@@ -219,9 +295,9 @@ const FormResponses = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-subtle">
+    <div className="min-h-screen bg-gradient-elegant">
       {/* Header */}
-      <header className="border-b bg-card/50 backdrop-blur-sm">
+      <header className="border-b bg-card/80 backdrop-blur-sm shadow-luxury">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
@@ -237,10 +313,34 @@ const FormResponses = () => {
               </div>
             </div>
             {responses.length > 0 && (
-              <Button onClick={exportResponses} className="shadow-elegant">
-                <Download className="h-4 w-4 mr-2" />
-                Export CSV
-              </Button>
+              <div className="flex gap-2">
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button className="shadow-elegant">
+                      <Download className="h-4 w-4 mr-2" />
+                      Export
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuItem onClick={exportResponses}>
+                      <FileIcon className="h-4 w-4 mr-2" />
+                      Export as CSV
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={exportPDF}>
+                      <FileText className="h-4 w-4 mr-2" />
+                      Export as PDF (Detailed)
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={exportSummaryPDF}>
+                      <BarChartIcon className="h-4 w-4 mr-2" />
+                      Export Summary PDF
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={exportBRD}>
+                      <FileText className="h-4 w-4 mr-2" />
+                      Generate BRD (AI-Powered)
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
             )}
           </div>
         </div>
@@ -249,10 +349,10 @@ const FormResponses = () => {
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-6xl mx-auto">
           {responses.length === 0 ? (
-            <Card className="shadow-card border-0 bg-card/80 backdrop-blur-sm">
+            <Card className="shadow-luxury border-0 bg-gradient-card backdrop-blur-sm">
               <CardContent className="pt-6">
                 <div className="text-center py-12">
-                  <FileText className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                  <FileIcon className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
                   <h3 className="text-lg font-semibold mb-2">No responses yet</h3>
                   <p className="text-muted-foreground">
                     Share your form link to start collecting responses.
@@ -272,7 +372,7 @@ const FormResponses = () => {
 
               <div className="grid gap-6">
                 {responses.map((response, index) => (
-                  <Card key={response.session_id} className="shadow-card border-0 bg-card/80 backdrop-blur-sm">
+                  <Card key={response.session_id} className="shadow-luxury border-0 bg-gradient-card backdrop-blur-sm">
                     <CardHeader>
                       <div className="flex items-center justify-between">
                         <CardTitle className="text-lg">Response #{index + 1}</CardTitle>
