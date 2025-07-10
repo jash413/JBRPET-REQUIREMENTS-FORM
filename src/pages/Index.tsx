@@ -21,7 +21,7 @@ const Index = () => {
               <Building2 className="w-6 h-6 sm:w-8 sm:h-8 text-white" />
             </div>
             <h1 className="text-3xl sm:text-5xl font-bold bg-gradient-to-r from-slate-800 to-slate-600 bg-clip-text text-transparent">
-              JB rPET Requirements Form
+              JB rPET INDUSTRIES PVT LTD
             </h1>
           </div>
 
