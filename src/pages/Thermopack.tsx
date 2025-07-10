@@ -1,11 +1,55 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Building2, ArrowRight, Users, Key } from "lucide-react";
-import { Link } from "react-router-dom";
+import { CheckCircle2, Building2, Users, Key } from "lucide-react";
+import PMSForm from "@/components/PMSForm";
 
-const Index = () => {
+const Thermopack = () => {
+  const [isSubmitted, setIsSubmitted] = useState(false);
+
+  const handleFormSubmit = (formData: any) => {
+    console.log('Form submitted with data:', formData);
+    setIsSubmitted(true);
+  };
+
+  if (isSubmitted) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 flex items-center justify-center p-4">
+        <Card className="w-full max-w-2xl mx-auto text-center shadow-2xl border-0 bg-white/80 backdrop-blur-sm">
+          <CardContent className="pt-8 pb-8 px-4 sm:pt-12 sm:pb-12 sm:px-8">
+            <div className="bg-green-100 w-16 h-16 sm:w-20 sm:h-20 rounded-full flex items-center justify-center mx-auto mb-6 sm:mb-8">
+              <CheckCircle2 className="w-8 h-8 sm:w-10 sm:h-10 text-green-600" />
+            </div>
+            <h1 className="text-2xl sm:text-4xl font-bold text-slate-800 mb-4 sm:mb-6">
+              Thank You for Your Submission!
+            </h1>
+            <p className="text-lg sm:text-xl text-slate-600 mb-6 sm:mb-8 leading-relaxed px-2">
+              We've successfully recorded your Thermopack Monitoring Dashboard requirements. 
+              Our expert development team will carefully review your specifications.
+            </p>
+            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-xl p-4 sm:p-6 mb-6 sm:mb-8">
+              <h3 className="font-semibold text-blue-900 mb-3 flex items-center justify-center gap-2 text-sm sm:text-base">
+                <Building2 className="w-4 h-4 sm:w-5 sm:h-5" />
+                What Happens Next?
+              </h3>
+              <p className="text-xs sm:text-sm text-blue-800 leading-relaxed">
+                Our development team will analyze your requirements and prepare a comprehensive, 
+                customized proposal for your Thermopack Monitoring Dashboard within 2-3 business days. 
+                You'll receive a detailed technical specification and timeline.
+              </p>
+            </div>
+            <Button 
+              onClick={() => setIsSubmitted(false)}
+              variant="outline"
+              className="bg-white hover:bg-slate-50 border-slate-300 text-slate-700 px-6 py-2 sm:px-8 sm:py-3 text-base sm:text-lg w-full sm:w-auto"
+            >
+              Submit Another Response
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
@@ -26,8 +70,8 @@ const Index = () => {
           </h2>
           
           <p className="text-base sm:text-xl text-slate-600 max-w-4xl mx-auto leading-relaxed mb-6 sm:mb-8 px-4">
-            Welcome to our comprehensive requirements gathering platform.
-            Choose the appropriate form to help us design the perfect solution tailored to your specific needs.
+            Welcome to our comprehensive Thermopack Monitoring Dashboard Requirements platform.
+            Help us design the perfect monitoring solution tailored to your specific industrial needs and operational requirements.
           </p>
 
           {/* Info Cards */}
@@ -64,49 +108,11 @@ const Index = () => {
           </div>
         </div>
 
-        {/* Navigation Section */}
-        <div className="max-w-4xl mx-auto">
-          <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-2xl hover:shadow-3xl transition-all duration-300">
-            <CardContent className="p-8 sm:p-12">
-              <div className="text-center mb-8">
-                <h3 className="text-2xl sm:text-3xl font-bold text-slate-800 mb-4">
-                  Select Your Requirements Form
-                </h3>
-                <p className="text-slate-600 text-lg">
-                  Choose the form that best matches your project needs
-                </p>
-              </div>
-              
-              <div className="grid gap-6">
-                <Link to="/thermopack" className="block">
-                  <Card className="bg-gradient-to-r from-blue-50 to-indigo-50 border-2 border-blue-200 hover:border-blue-400 transition-all duration-300 hover:shadow-lg cursor-pointer">
-                    <CardContent className="p-6 sm:p-8">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-4">
-                          <div className="bg-gradient-to-r from-blue-500 to-indigo-500 w-12 h-12 sm:w-16 sm:h-16 rounded-xl flex items-center justify-center">
-                            <Building2 className="w-6 h-6 sm:w-8 sm:h-8 text-white" />
-                          </div>
-                          <div className="text-left">
-                            <h4 className="text-xl sm:text-2xl font-bold text-slate-800 mb-2">
-                              Thermopack Monitoring Dashboard
-                            </h4>
-                            <p className="text-slate-600 text-sm sm:text-base">
-                              Industrial monitoring system for thermopack units with real-time data tracking and analytics
-                            </p>
-                          </div>
-                        </div>
-                        <ArrowRight className="w-6 h-6 text-blue-600 flex-shrink-0" />
-                      </div>
-                    </CardContent>
-                  </Card>
-                </Link>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+        {/* Form Section */}
+        <PMSForm onSubmit={handleFormSubmit} />
       </div>
     </div>
   );
 };
 
-export default Index;
+export default Thermopack;
