@@ -18,7 +18,8 @@ const App = () => (
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/thermopack" element={<Thermopack />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+          <Route path="/general" element={<Thermopack />} />
+          <Route path="/steam-boiler" element={<Thermopack />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

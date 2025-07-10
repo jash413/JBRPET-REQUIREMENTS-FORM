@@ -82,7 +82,7 @@ const Thermopack = () => {
                   <Users className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" />
                 </div>
                 <h3 className="font-semibold text-slate-800 mb-2 text-sm sm:text-base">For</h3>
-                <p className="text-slate-600 text-sm sm:text-base">Chandresh Patel</p>
+                <p className="text-slate-600 text-sm sm:text-base">Hardik Agrawal</p>
               </CardContent>
             </Card>
             
