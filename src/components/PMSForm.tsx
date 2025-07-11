@@ -7,19 +7,36 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import FormSection from './FormSection';
 import { formSections } from '@/data/formSections';
+import { generalFormSections } from '@/data/generalFormSections';
+import { steamBoilerFormSections } from '@/data/steamBoilerFormSections';
 
 interface PMSFormProps {
   onSubmit: (data: any) => void;
+  formType?: 'thermopack' | 'general' | 'steamBoiler';
 }
 
-const PMSForm: React.FC<PMSFormProps> = ({ onSubmit }) => {
+const PMSForm: React.FC<PMSFormProps> = ({ onSubmit, formType = 'thermopack' }) => {
   const [currentSection, setCurrentSection] = useState(0);
   const [formData, setFormData] = useState<Record<string, any>>({});
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
 
-  const totalSections = formSections.length;
+  // Select the appropriate form sections based on formType
+  const getFormSections = () => {
+    switch (formType) {
+      case 'general':
+        return generalFormSections;
+      case 'steamBoiler':
+        return steamBoilerFormSections;
+      case 'thermopack':
+      default:
+        return formSections;
+    }
+  };
+
+  const currentFormSections = getFormSections();
+  const totalSections = currentFormSections.length;
   const progress = ((currentSection + 1) / totalSections) * 100;
 
   const handleFieldChange = (fieldName: string, value: any) => {
@@ -37,7 +54,7 @@ const PMSForm: React.FC<PMSFormProps> = ({ onSubmit }) => {
   };
 
   const validateCurrentSection = () => {
-    const currentSectionData = formSections[currentSection];
+    const currentSectionData = currentFormSections[currentSection];
     const newErrors: Record<string, string> = {};
     
     currentSectionData.questions.forEach(question => {
@@ -112,7 +129,7 @@ const PMSForm: React.FC<PMSFormProps> = ({ onSubmit }) => {
       console.log('Form submitted successfully:', data);
       toast({
         title: "Form Submitted Successfully!",
-        description: "Your Thermopack monitoring requirements have been recorded.",
+        description: `Your ${formType === 'general' ? 'general dashboard' : formType === 'steamBoiler' ? 'steam-boiler monitoring' : 'thermopack monitoring'} requirements have been recorded.`,
       });
 
       onSubmit(formData);
@@ -145,7 +162,7 @@ const PMSForm: React.FC<PMSFormProps> = ({ onSubmit }) => {
                   Section {currentSection + 1} of {totalSections}
                 </p>
                 <p className="text-xs sm:text-sm text-slate-600">
-                  {formSections[currentSection].title}
+                  {currentFormSections[currentSection].title}
                 </p>
               </div>
             </div>
@@ -172,11 +189,11 @@ const PMSForm: React.FC<PMSFormProps> = ({ onSubmit }) => {
             </div>
             <div className="flex-1">
               <CardTitle className="text-xl sm:text-3xl text-slate-800 mb-2 sm:mb-3 leading-tight">
-                {formSections[currentSection].title}
+                {currentFormSections[currentSection].title}
               </CardTitle>
-              {formSections[currentSection].description && (
+              {currentFormSections[currentSection].description && (
                 <CardDescription className="text-sm sm:text-lg text-slate-600 leading-relaxed">
-                  {formSections[currentSection].description}
+                  {currentFormSections[currentSection].description}
                 </CardDescription>
               )}
             </div>
@@ -184,7 +201,7 @@ const PMSForm: React.FC<PMSFormProps> = ({ onSubmit }) => {
         </CardHeader>
         <CardContent className="px-4 pb-6 sm:px-8 sm:pb-8">
           <FormSection
-            section={formSections[currentSection]}
+            section={currentFormSections[currentSection]}
             formData={formData}
             errors={errors}
             onFieldChange={handleFieldChange}
@@ -205,7 +222,7 @@ const PMSForm: React.FC<PMSFormProps> = ({ onSubmit }) => {
         </Button>
 
         <div className="flex gap-2 sm:gap-3 order-1 sm:order-2">
-          {formSections.map((_, index) => (
+          {currentFormSections.map((_, index) => (
             <button
               key={index}
               onClick={() => setCurrentSection(index)}

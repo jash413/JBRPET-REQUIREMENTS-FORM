@@ -4,11 +4,11 @@ import { Button } from "@/components/ui/button";
 import { CheckCircle2, Building2, Users, Key } from "lucide-react";
 import PMSForm from "@/components/PMSForm";
 
-const Thermopack = () => {
+const SteamBoiler = () => {
   const [isSubmitted, setIsSubmitted] = useState(false);
 
   const handleFormSubmit = (formData: any) => {
-    console.log('Form submitted with data:', formData);
+    console.log('Steam-boiler form submitted with data:', formData);
     setIsSubmitted(true);
   };
 
@@ -24,7 +24,7 @@ const Thermopack = () => {
               Thank You for Your Submission!
             </h1>
             <p className="text-lg sm:text-xl text-slate-600 mb-6 sm:mb-8 leading-relaxed px-2">
-              We've successfully recorded your Thermopack Monitoring Dashboard requirements. 
+              We've successfully recorded your Steam-boiler Monitoring Dashboard requirements. 
               Our expert development team will carefully review your specifications.
             </p>
             <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-xl p-4 sm:p-6 mb-6 sm:mb-8">
@@ -34,7 +34,7 @@ const Thermopack = () => {
               </h3>
               <p className="text-xs sm:text-sm text-blue-800 leading-relaxed">
                 Our development team will analyze your requirements and prepare a comprehensive, 
-                customized proposal for your Thermopack Monitoring Dashboard within 2-3 business days. 
+                customized proposal for your Steam-boiler Monitoring Dashboard within 2-3 business days. 
                 You'll receive a detailed technical specification and timeline.
               </p>
             </div>
@@ -61,7 +61,7 @@ const Thermopack = () => {
               <Building2 className="w-6 h-6 sm:w-8 sm:h-8 text-white" />
             </div>
             <h1 className="text-3xl sm:text-5xl font-bold bg-gradient-to-r from-slate-800 to-slate-600 bg-clip-text text-transparent">
-              Thermopack Dashboard
+              Steam-boiler Dashboard
             </h1>
           </div>
           
@@ -70,7 +70,7 @@ const Thermopack = () => {
           </h2>
           
           <p className="text-base sm:text-xl text-slate-600 max-w-4xl mx-auto leading-relaxed mb-6 sm:mb-8 px-4">
-            Welcome to our comprehensive Thermopack Monitoring Dashboard Requirements platform.
+            Welcome to our comprehensive Steam-boiler Monitoring Dashboard Requirements platform.
             Help us design the perfect monitoring solution tailored to your specific industrial needs and operational requirements.
           </p>
 
@@ -109,10 +109,10 @@ const Thermopack = () => {
         </div>
 
         {/* Form Section */}
-        <PMSForm onSubmit={handleFormSubmit} formType="thermopack" />
+        <PMSForm onSubmit={handleFormSubmit} formType="steamBoiler" />
       </div>
     </div>
   );
 };
 
-export default Thermopack;
+export default SteamBoiler;

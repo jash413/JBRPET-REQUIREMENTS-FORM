@@ -4,11 +4,11 @@ import { Button } from "@/components/ui/button";
 import { CheckCircle2, Building2, Users, Key } from "lucide-react";
 import PMSForm from "@/components/PMSForm";
 
-const Thermopack = () => {
+const General = () => {
   const [isSubmitted, setIsSubmitted] = useState(false);
 
   const handleFormSubmit = (formData: any) => {
-    console.log('Form submitted with data:', formData);
+    console.log('General form submitted with data:', formData);
     setIsSubmitted(true);
   };
 
@@ -24,7 +24,7 @@ const Thermopack = () => {
               Thank You for Your Submission!
             </h1>
             <p className="text-lg sm:text-xl text-slate-600 mb-6 sm:mb-8 leading-relaxed px-2">
-              We've successfully recorded your Thermopack Monitoring Dashboard requirements. 
+              We've successfully recorded your general dashboard requirements for both Thermopack and Steam-boiler monitoring systems. 
               Our expert development team will carefully review your specifications.
             </p>
             <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-xl p-4 sm:p-6 mb-6 sm:mb-8">
@@ -33,9 +33,9 @@ const Thermopack = () => {
                 What Happens Next?
               </h3>
               <p className="text-xs sm:text-sm text-blue-800 leading-relaxed">
-                Our development team will analyze your requirements and prepare a comprehensive, 
-                customized proposal for your Thermopack Monitoring Dashboard within 2-3 business days. 
-                You'll receive a detailed technical specification and timeline.
+                Our development team will analyze your requirements and prepare comprehensive, 
+                customized proposals for both your Thermopack and Steam-boiler monitoring dashboards within 2-3 business days. 
+                You'll receive detailed technical specifications and timelines for both systems.
               </p>
             </div>
             <Button 
@@ -61,17 +61,17 @@ const Thermopack = () => {
               <Building2 className="w-6 h-6 sm:w-8 sm:h-8 text-white" />
             </div>
             <h1 className="text-3xl sm:text-5xl font-bold bg-gradient-to-r from-slate-800 to-slate-600 bg-clip-text text-transparent">
-              Thermopack Dashboard
+              General Requirements
             </h1>
           </div>
           
           <h2 className="text-xl sm:text-3xl font-semibold text-slate-700 mb-4 sm:mb-6">
-            Monitoring System Requirements
+            Dashboard Requirements for Both Systems
           </h2>
           
           <p className="text-base sm:text-xl text-slate-600 max-w-4xl mx-auto leading-relaxed mb-6 sm:mb-8 px-4">
-            Welcome to our comprehensive Thermopack Monitoring Dashboard Requirements platform.
-            Help us design the perfect monitoring solution tailored to your specific industrial needs and operational requirements.
+            Welcome to our comprehensive General Requirements platform for both Thermopack and Steam-boiler monitoring dashboards.
+            Help us design the perfect monitoring solutions tailored to your specific industrial needs and operational requirements.
           </p>
 
           {/* Info Cards */}
@@ -92,7 +92,7 @@ const Thermopack = () => {
                   <span className="text-green-600 font-bold text-base sm:text-lg">⏱</span>
                 </div>
                 <h3 className="font-semibold text-slate-800 mb-2 text-sm sm:text-base">Duration</h3>
-                <p className="text-slate-600 text-sm sm:text-base">10-15 minutes</p>
+                <p className="text-slate-600 text-sm sm:text-base">15-20 minutes</p>
               </CardContent>
             </Card>
             
@@ -102,17 +102,17 @@ const Thermopack = () => {
                   <Key className="w-5 h-5 sm:w-6 sm:h-6 text-purple-600" />
                 </div>
                 <h3 className="font-semibold text-slate-800 mb-2 text-sm sm:text-base">Purpose</h3>
-                <p className="text-slate-600 text-sm sm:text-base">Custom Dashboard Design</p>
+                <p className="text-slate-600 text-sm sm:text-base">Dual Dashboard Design</p>
               </CardContent>
             </Card>
           </div>
         </div>
 
         {/* Form Section */}
-        <PMSForm onSubmit={handleFormSubmit} formType="thermopack" />
+        <PMSForm onSubmit={handleFormSubmit} formType="general" />
       </div>
     </div>
   );
 };
 
-export default Thermopack;
+export default General;

@@ -5,6 +5,8 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import Thermopack from "./pages/Thermopack";
+import General from "./pages/General";
+import SteamBoiler from "./pages/SteamBoiler";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -17,9 +19,9 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />
+          <Route path="/general" element={<General />} />
           <Route path="/thermopack" element={<Thermopack />} />
-          <Route path="/general" element={<Thermopack />} />
-          <Route path="/steam-boiler" element={<Thermopack />} />
+          <Route path="/steam-boiler" element={<SteamBoiler />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
