@@ -27,13 +27,6 @@ export const steamBoilerFormSections: FormSection[] = [
         placeholder: "Enter number of boilers",
       },
       {
-        id: "boiler_locations",
-        label: "3. Location/Zone of each boiler (if applicable):",
-        type: "text",
-        required: false,
-        placeholder: "Boiler 1 - Plant A, Boiler 2 - Plant B...",
-      },
-      {
         id: "operating_hours",
         label: "4. What is the operating schedule?",
         type: "radio",
