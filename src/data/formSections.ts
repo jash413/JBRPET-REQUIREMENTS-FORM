@@ -1,11 +1,10 @@
-import { FormSection } from '@/types/form';
+import { FormSection } from "@/types/form";
 
 export const formSections: FormSection[] = [
   {
-    id: "system-configuration",
-    title: "System Configuration",
-    description:
-      "Details about the Thermopack system setup and data capture methods.",
+    id: "system-overview",
+    title: "System Overview",
+    description: "Basic information about your Thermopack system setup.",
     questions: [
       {
         id: "thermopack_type",
@@ -23,14 +22,14 @@ export const formSections: FormSection[] = [
       },
       {
         id: "units_to_monitor",
-        label: "2. No. of Thermopack Units to Monitor:",
+        label: "2. How many Thermopack units need monitoring?",
         type: "text",
         required: true,
         placeholder: "Enter number of units",
       },
       {
         id: "operating_hours",
-        label: "3. Operating Hours:",
+        label: "3. Operating Schedule:",
         type: "radio",
         required: true,
         options: [
@@ -45,12 +44,19 @@ export const formSections: FormSection[] = [
         label: "4. Shift Timings (if applicable):",
         type: "text",
         required: false,
-        placeholder:
-          "Shift A: [start] to [end], Shift B: [start] to [end], Shift C: [start] to [end]",
+        placeholder: "Shift A: [start] to [end], Shift B: [start] to [end]",
       },
+    ],
+  },
+  {
+    id: "data-capture",
+    title: "Data Capture & Entry",
+    description:
+      "Details about how Thermopack data is currently recorded and expected to be digitized.",
+    questions: [
       {
         id: "data_capture_method",
-        label: "5. How is data captured currently?",
+        label: "1. How is data currently captured?",
         type: "radio",
         required: true,
         options: [
@@ -63,7 +69,7 @@ export const formSections: FormSection[] = [
       },
       {
         id: "data_entry_mode",
-        label: "6. Preferred Data Entry Mode:",
+        label: "2. Preferred Mode of Data Entry:",
         type: "radio",
         required: true,
         options: [
@@ -72,58 +78,155 @@ export const formSections: FormSection[] = [
           { value: "both", label: "Both" },
         ],
       },
+      {
+        id: "historical_data_entry",
+        label: "3. Do you plan to digitize historical log sheets?",
+        type: "radio",
+        required: true,
+        options: [
+          { value: "yes", label: "Yes" },
+          { value: "no", label: "No" },
+        ],
+      },
     ],
   },
   {
-    id: "metrics-tracked",
-    title: "Metrics to be Tracked",
+    id: "metrics-parameters",
+    title: "Key Metrics & Parameters",
     description:
-      "Specify the key performance indicators and metrics for monitoring.",
+      "Define which Thermopack parameters and derived metrics must be monitored.",
     questions: [
       {
-        id: "metrics_selection",
-        label: "1. Which metrics should be tracked?",
+        id: "detailed_metrics_selection",
+        label: "1. Select all Thermopack parameters to monitor:",
         type: "multiselect",
         required: true,
         options: [
+          { value: "bed_pressure", label: "Bed Pressure" },
+          { value: "oil_outlet_pressure", label: "Oil Outlet Pump Pressure" },
+          { value: "oil_inlet_pressure", label: "Oil Inlet Pump Pressure" },
           {
-            value: "temperature_monitoring",
-            label: "Temperature Monitoring (e.g., Bed Temperature °C)",
+            value: "delta_temp",
+            label: "Delta / Differential Temperature (°C)",
           },
+          {
+            value: "circulation_pump_freq",
+            label: "Circulation Pump Frequency (Hz)",
+          },
+          { value: "circuit_pressure", label: "Circuit Pressure" },
+          { value: "id_fan_freq", label: "ID Fan Frequency (Hz)" },
+          { value: "fd_fan_freq", label: "FD Fan Frequency (Hz)" },
+          {
+            value: "screw_feed_1_freq",
+            label: "Screw Feeder 1 Frequency (Hz)",
+          },
+          {
+            value: "screw_feed_2_freq",
+            label: "Screw Feeder 2 Frequency (Hz)",
+          },
+          { value: "bed_temperature", label: "Bed Temperature (°C)" },
+          { value: "flame_temperature", label: "Flame Temperature (°C)" },
+          { value: "air_from_fd", label: "Air from FD (Temp or Flow)" },
+          {
+            value: "stack_temp_before_filter",
+            label: "Stack Temp Before Bag Filter",
+          },
+          { value: "stack_temp_after_fan", label: "Stack Temp After ID Fan" },
+        ],
+      },
+      {
+        id: "metrics_selection",
+        label: "2. Select additional performance indicators:",
+        type: "multiselect",
+        required: true,
+        options: [
+          { value: "temperature_monitoring", label: "Temperature Monitoring" },
           { value: "pressure_monitoring", label: "Pressure Monitoring" },
           { value: "pump_fan_frequencies", label: "Pump & Fan Frequencies" },
           { value: "production_fuel", label: "Production & Fuel" },
-          { value: "derived_metrics", label: "Derived Metrics" },
+          {
+            value: "derived_metrics",
+            label: "Derived Metrics (e.g. Efficiency)",
+          },
+        ],
+      },
+      {
+        id: "coal_consumption_tracking",
+        label: "3. Track fuel consumption (e.g., coal usage)?",
+        type: "radio",
+        required: true,
+        options: [
+          { value: "yes", label: "Yes" },
+          { value: "no", label: "No" },
+        ],
+      },
+      {
+        id: "daily_load_monitoring",
+        label: "4. Track daily thermal load output?",
+        type: "radio",
+        required: true,
+        options: [
+          { value: "yes", label: "Yes" },
+          { value: "no", label: "No" },
+        ],
+      },
+    ],
+  },
+  {
+    id: "alerts-alarms",
+    title: "Alerts & Alarm Triggers",
+    description:
+      "Configure conditions that should trigger alerts or safety mechanisms.",
+    questions: [
+      {
+        id: "stack_temp_alerts",
+        label: "1. Trigger alerts for high stack temperatures?",
+        type: "radio",
+        required: true,
+        options: [
+          { value: "yes", label: "Yes" },
+          { value: "no", label: "No" },
         ],
       },
       {
         id: "safety_alarms",
-        label: "2. Safety & Alarm Conditions",
+        label: "2. Safety conditions to track:",
         type: "multiselect",
         required: false,
         options: [
-          {
-            value: "flame_failure",
-            label: "Flame failure or low flame detection",
-          },
-          { value: "fuel_feed_interruption", label: "Fuel feed interruption" },
-          {
-            value: "emergency_shutdown",
-            label: "Emergency shutdown trigger logs",
-          },
+          { value: "flame_failure", label: "Flame Failure" },
+          { value: "fuel_feed_interruption", label: "Fuel Feed Interruption" },
+          { value: "emergency_shutdown", label: "Emergency Shutdown" },
         ],
+      },
+      {
+        id: "anomaly_detection",
+        label: "3. Require anomaly detection or threshold alerts?",
+        type: "radio",
+        required: true,
+        options: [
+          { value: "yes", label: "Yes" },
+          { value: "no", label: "No" },
+        ],
+      },
+      {
+        id: "thresholds",
+        label: "3a. Specify thresholds for critical alerts (if any):",
+        type: "textarea",
+        required: false,
+        placeholder: "Enter thresholds for alerts",
       },
     ],
   },
   {
-    id: "time-range-filtering",
+    id: "time-filters",
     title: "Time Range & Filtering",
     description:
-      "Define the time-based filtering and comparison options for the dashboard.",
+      "Time-based filters, shift filters, and performance comparisons.",
     questions: [
       {
         id: "time_filters",
-        label: "1. Which time filters should the dashboard support?",
+        label: "1. Which time filters should be available?",
         type: "multiselect",
         required: true,
         options: [
@@ -136,7 +239,7 @@ export const formSections: FormSection[] = [
       },
       {
         id: "shift_based_filtering",
-        label: "2. Do you need shift-based data filtering?",
+        label: "2. Enable shift-based data filtering?",
         type: "radio",
         required: true,
         options: [
@@ -146,8 +249,7 @@ export const formSections: FormSection[] = [
       },
       {
         id: "trend_comparison",
-        label:
-          "3. Do you want to compare two different time periods (trend comparison)?",
+        label: "3. Support time-based trend comparison?",
         type: "radio",
         required: true,
         options: [
@@ -157,7 +259,7 @@ export const formSections: FormSection[] = [
       },
       {
         id: "time_on_idle",
-        label: "4. Would you like a 'Time-on' vs 'Idle Time' metric?",
+        label: "4. Track 'Time-on' vs 'Idle Time'?",
         type: "radio",
         required: true,
         options: [
@@ -168,9 +270,57 @@ export const formSections: FormSection[] = [
     ],
   },
   {
-    id: "users-roles",
-    title: "Users & Roles",
-    description: "Define the user roles and access control for the dashboard.",
+    id: "visualization-output",
+    title: "Visualization & Output Preferences",
+    description: "Define how you want to see the data and receive outputs.",
+    questions: [
+      {
+        id: "visual_types",
+        label: "1. Preferred Visualization Types:",
+        type: "multiselect",
+        required: true,
+        options: [
+          { value: "kpi_cards", label: "KPI Cards" },
+          { value: "line_charts", label: "Line Charts" },
+          { value: "bar_graphs", label: "Bar Graphs" },
+          { value: "heatmaps", label: "Heatmaps" },
+          { value: "gauges", label: "Gauges" },
+          { value: "tables", label: "Tables" },
+        ],
+      },
+      {
+        id: "output_formats",
+        label: "2. Required Output Formats:",
+        type: "multiselect",
+        required: true,
+        options: [
+          { value: "alerts_notifications", label: "Alerts / Notifications" },
+          { value: "pdf_excel_export", label: "PDF / Excel Export" },
+          { value: "email_report_delivery", label: "Email Report Delivery" },
+          {
+            value: "printable_report_layouts",
+            label: "Printable Report Layouts",
+          },
+          {
+            value: "multi_location_dashboard",
+            label: "Multi-location Dashboard",
+          },
+        ],
+      },
+      {
+        id: "color_brand_guidelines",
+        label: "3. Color/Brand Guidelines (if any):",
+        type: "textarea",
+        required: false,
+        placeholder: "Enter color schemes or brand requirements",
+      },
+    ],
+  },
+  {
+    id: "users-access",
+    title: "Users & Access Control",
+    description:
+      "User roles and access management for the Thermopack dashboard.",
     questions: [
       {
         id: "dashboard_users",
@@ -197,109 +347,28 @@ export const formSections: FormSection[] = [
       },
       {
         id: "access_levels",
-        label: "2a. If yes, please describe access levels:",
+        label: "2a. If yes, define access levels per role:",
         type: "textarea",
         required: false,
         placeholder: "Describe access levels for each role",
       },
       {
         id: "number_of_users",
-        label: "3. No. of dashboard users:",
+        label: "3. Number of dashboard users:",
         type: "text",
         required: true,
-        placeholder: "Enter number of users",
+        placeholder: "Enter total number of users",
       },
     ],
   },
   {
-    id: "output-preferences",
-    title: "Output Preferences",
-    description:
-      "Specify the output formats and alert preferences for the dashboard.",
-    questions: [
-      {
-        id: "output_formats",
-        label: "1. What output formats are required?",
-        type: "multiselect",
-        required: true,
-        options: [
-          { value: "alerts_notifications", label: "Alerts / Notifications" },
-          { value: "pdf_excel_export", label: "PDF / Excel Export" },
-          { value: "email_report_delivery", label: "Email Report Delivery" },
-          {
-            value: "printable_report_layouts",
-            label: "Printable Report Layouts",
-          },
-          {
-            value: "multi_location_dashboard",
-            label: "Multi-location Dashboard (if applicable)",
-          },
-        ],
-      },
-      {
-        id: "anomaly_detection",
-        label: "2. Do you want anomaly detection or critical value alerts?",
-        type: "radio",
-        required: true,
-        options: [
-          { value: "yes", label: "Yes" },
-          { value: "no", label: "No" },
-        ],
-      },
-      {
-        id: "thresholds",
-        label: "2a. If yes, please list the thresholds:",
-        type: "textarea",
-        required: false,
-        placeholder:
-          "Specify thresholds for anomaly detection or critical alerts",
-      },
-    ],
-  },
-  {
-    id: "visualization-preferences",
-    title: "Visualization Preferences",
-    description:
-      "Define the preferred visualization types and branding guidelines.",
-    questions: [
-      {
-        id: "visual_types",
-        label: "1. Preferred Visual Types:",
-        type: "multiselect",
-        required: true,
-        options: [
-          {
-            value: "kpi_cards",
-            label: "KPI Cards (e.g. Avg Stack Temp, Daily Load)",
-          },
-          { value: "line_charts", label: "Line Charts (Temp/Pressure trends)" },
-          { value: "bar_graphs", label: "Bar Graphs (Fuel vs Load)" },
-          {
-            value: "heatmaps",
-            label: "Heatmaps (Hourly bed temp or frequency)",
-          },
-          { value: "gauges", label: "Gauges (Fan speed, pressure)" },
-          { value: "tables", label: "Tables (Raw logs)" },
-        ],
-      },
-      {
-        id: "color_brand_guidelines",
-        label: "2. Color/Brand Guidelines (if any):",
-        type: "textarea",
-        required: false,
-        placeholder: "Specify color schemes or branding guidelines",
-      },
-    ],
-  },
-  {
-    id: "technical-details",
-    title: "Technical Details",
-    description:
-      "Provide details about system integration and technical contacts.",
+    id: "integration-technical",
+    title: "System Integration & Technical Setup",
+    description: "Integration points, data formats, and technical contacts.",
     questions: [
       {
         id: "system_integration",
-        label: "1. Do you need integration with an existing system?",
+        label: "1. Do you require integration with existing systems?",
         type: "radio",
         required: true,
         options: [
@@ -309,7 +378,7 @@ export const formSections: FormSection[] = [
       },
       {
         id: "integration_type",
-        label: "1a. If yes, which one:",
+        label: "1a. If yes, which systems?",
         type: "multiselect",
         required: false,
         options: [
@@ -321,7 +390,7 @@ export const formSections: FormSection[] = [
       },
       {
         id: "sample_data_format",
-        label: "2. Do you have a sample file or data format (CSV, Excel, SQL)?",
+        label: "2. Do you have sample data files (CSV, Excel, SQL)?",
         type: "radio",
         required: true,
         options: [
@@ -334,24 +403,21 @@ export const formSections: FormSection[] = [
         label: "3. IT/Automation Contact Person:",
         type: "text",
         required: false,
-        placeholder: "Name: [Enter name], Email/Phone: [Enter contact details]",
+        placeholder: "Name, Email/Phone",
       },
     ],
   },
   {
-    id: "additional-notes",
-    title: "Additional Notes",
-    description:
-      "Provide any custom logic, formulas, or additional expectations.",
+    id: "additional-requirements",
+    title: "Additional Requirements",
+    description: "Any custom logic, formulas, or expectations to consider.",
     questions: [
       {
         id: "custom_logic",
-        label:
-          "1. Please share any custom logic, formulas, or other expectations:",
+        label: "1. Share any custom logic, calculations, or formulas:",
         type: "textarea",
         required: false,
-        placeholder:
-          "Describe any custom logic, formulas, or other expectations",
+        placeholder: "Describe additional logic or KPIs",
       },
     ],
   },
