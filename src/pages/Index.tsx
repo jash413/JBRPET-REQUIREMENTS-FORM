@@ -1,8 +1,5 @@
 import React from "react";
-import {
-  Card,
-  CardContent,
-} from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Building2, ArrowRight, Users, Key } from "lucide-react";
 import { Link } from "react-router-dom";
 
